@@ -1,0 +1,952 @@
+{
+  "name": "CabreBot_gym 🤖",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "8593a67d-21db-4116-b6ec-23f6e8eb9541",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -3008,
+        384
+      ],
+      "id": "d5beb5be-e80c-41a3-8e00-54094ca31464",
+      "name": "Webhook",
+      "webhookId": "8593a67d-21db-4116-b6ec-23f6e8eb9541"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('data_message_extraction').item.json.sessionId }}",
+        "options": {
+          "systemMessage": "=🎭 Rol:\nEres CabreBot, asistente virtual de atención al cliente de Cabrejo Gym, centro de entrenamiento de pesas en Neiva, Colombia.\n\nTu estilo es amable, amigable, natural, breve y respetuoso. Siempre guías al cliente paso a paso sin repetir información ni hacer preguntas innecesarias.\n\n🕘 Horarios de atención\nLunes a Viernes: 5:00 a. m. – 9:30 p. m.\n\nSábados: 8:00 a. m. – 2:00 p. m.\n\n🔧 Herramientas disponibles\n\nGoogle Calendar: para agendar, reprogramar, consultar o eliminar citas de valoracion.\n\n**Google Calendar – Gestión de citas de valoración física:**\n\n| Acción                        | Herramienta                   |\n|------------------------------|-------------------------------|\n| Agendar nueva cita           | `agendar_cita_valoracion`     |\n| Reprogramar cita             | `programar_cita_valoracion`   |\n| Consultar cita existente     | `consultar_cita_valoracion`   |\n| Eliminar cita                | `eliminar_cita_valoracion`    |\n\n\n   - Agendar cita: Cuando el usuario desee agendar cita de        valoracion usa la herramienta *agendar_cita_valoracion*\n   - Reprogramar cita: Cuando el usuario desee reprogramar        una cita de valoracion usa la herramienta                    *programar_cita_valoracion*.\n   - Consultar cita: Cuando el usuario desee consultar la         fecha y hora de la cita de valoracion usa la                 herramienta *consultar_cita_valoracion*.\n   - Eliminar cita: Cuando el usuario desee eliminar la cita      de valoración usa *eliminar_cita_valoracion*.\n\n\n🎯 Objetivo\nBrindar una experiencia clara y efectiva en procesos de agendamiento de cita e incluso ofrecer el servicio.\n\n🧭 Flujo de atención\n1. **Saludo e intención inicial**  \n   “¡Hola! Soy CabreBot, tu guía en Cabrejo Gym 🏋️. ¿Te gustaría agendar una cita de valoración para alcanzar tus metas de entrenamiento?”\n\n2. **Identificación de acción deseada**  \n   - Agendar, reprogramar, consultar o eliminar cita.\n\n3. **Validación de disponibilidad según horario**\n\n4. **Confirmación de la cita**  \n   “Tu cita ha sido programada para [fecha y hora]. ¡Te esperamos para ayudarte a potenciar tus resultados!”\n\n\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        352
+      ],
+      "id": "7cd87611-7233-4eba-97e9-99346ef96979",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        -240,
+        976
+      ],
+      "id": "8f8b3954-d9fb-43a6-9440-7c3e4871941c",
+      "name": "Postgres Chat Memory"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={EVOLUTION_API_BASE_URL}/message/sendText/{INSTANCE_NAME}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "apikey",
+              "value": "xxxxxxxxXXXX"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('data_message_extraction').item.json.sender.split('@')[0] }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        400,
+        480
+      ],
+      "id": "05f9f422-648f-4e6f-9a94-6f246cb63543",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -368,
+        816
+      ],
+      "id": "34ae1f2a-4a75-4505-bb14-d7fd3565f856",
+      "name": "OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cac0dce2-1154-4c0c-ae8a-2a998052e57f",
+              "name": "unregister_user",
+              "value": "=¡Hola! 👋 soy CabreBot 🤖 y No encontré tu número registrado en nuestro sistema. Para acceder a nuestros servicios y recibir rutinas personalizadas, necesitas estar registrado como miembro del gimnasio.  Por favor acércate a recepción para registrarte y obtener todos los beneficios.   ¡Te esperamos! 🏋️‍♀️",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -848,
+        592
+      ],
+      "id": "8a3dae9a-8016-472e-b0e9-dc36821a7860",
+      "name": "unregistered_user_message"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Usa esta herramienta cuando el usuario quiera saber la disponibilidad de citas de valoración",
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "jsebastian.t97@gmail.com",
+          "mode": "list",
+          "cachedResultName": "jsebastian.t97@gmail.com"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        592,
+        960
+      ],
+      "id": "c31f0f33-ebb4-45c5-ba0b-308ca16fd097",
+      "name": "consultar_cita_valoracion"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Usa esta herramienta cuando el usuario quiera mover o reprogramar una cita de valoración a otro día o en otra hora.",
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "value": "jsebastian.t97@gmail.com",
+          "mode": "list",
+          "cachedResultName": "jsebastian.t97@gmail.com"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "updateFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        128,
+        992
+      ],
+      "id": "464c9f86-dec7-4071-b475-9ce5c34bb89b",
+      "name": "reprogramar_cita_valoracion"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Usa esta herrramienta cuando el usuario quiera agendar una cita de valoración",
+        "calendar": {
+          "__rl": true,
+          "value": "jsebastian.t97@gmail.com",
+          "mode": "list",
+          "cachedResultName": "jsebastian.t97@gmail.com"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', ``, 'string') }}",
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        -48,
+        880
+      ],
+      "id": "f5f23fed-428a-44a2-ab19-b303cbd78d26",
+      "name": "agendar_cita_valoracion"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Usa esta herramienta cuando el usuario quiera eliminar la cita de valoración existente.",
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "jsebastian.t97@gmail.com",
+          "mode": "list",
+          "cachedResultName": "jsebastian.t97@gmail.com"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        272,
+        880
+      ],
+      "id": "cf1dcd6a-cec8-4396-96f3-37152a090979",
+      "name": "eliminar_cita_valoracion"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "voice_message",
+        "options": {
+          "mimeType": "=audio/ogg"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -2368,
+        544
+      ],
+      "id": "73d55d34-15a7-4bf6-9e47-1cc8a5fa5fd2",
+      "name": "Convert to File1"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -2224,
+        544
+      ],
+      "id": "d2c9099f-007a-43e4-b15d-f9e3c1755214",
+      "name": "OpenAI1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "98818c7f-1ded-4fb3-9e17-e00db359164d",
+              "name": "sender",
+              "value": "={{ $json.body.data.key.remoteJid }}",
+              "type": "string"
+            },
+            {
+              "id": "c0ad29db-5afd-4030-a66a-1bdefbc24824",
+              "name": "message_type",
+              "value": "={{ $json.body.data.messageType }}",
+              "type": "string"
+            },
+            {
+              "id": "242d4bff-bd3b-4f75-a2f3-bebaccb00790",
+              "name": "voice_message",
+              "value": "={{ $json.body.data.message.base64 }}",
+              "type": "string"
+            },
+            {
+              "id": "bea0e3b0-12d0-456c-9db5-659f46dd67e0",
+              "name": "text_message",
+              "value": "={{ $json.body.data.message.conversation }}",
+              "type": "string"
+            },
+            {
+              "id": "3599836b-e92b-465c-9f76-597e107e297f",
+              "name": "session_id",
+              "value": "={{ $json.body.data.key.id }}",
+              "type": "string"
+            },
+            {
+              "id": "cebc79db-0369-4e20-9cd2-e9a035074c8c",
+              "name": "data_time",
+              "value": "={{ $json.body.data.messageTimestamp.toDateTime('s').toLocal() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2784,
+        384
+      ],
+      "id": "d410e56e-7cf5-47ca-9b15-f84538728457",
+      "name": "data_message_extraction"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3b72c009-6f4d-45b2-b254-e3a361447123",
+              "name": "final_message",
+              "value": "={{ $json.text_message }}",
+              "type": "string"
+            },
+            {
+              "id": "0b78d872-bbea-4c4f-87eb-bc01456f08d6",
+              "name": "sessionId",
+              "value": "={{ $('data_message_extraction').item.json.session_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2224,
+        288
+      ],
+      "id": "f32f27e1-83e5-4aba-8bab-2fca4d6fad1c",
+      "name": "final_message_txt"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "message",
+        "key": "={{ $('data_message_extraction').item.json.sender }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1664,
+        368
+      ],
+      "id": "edac76a5-5ac4-4054-8d60-3744091e6bf6",
+      "name": "get_buffer_data1"
+    },
+    {
+      "parameters": {
+        "operation": "push",
+        "list": "={{ $('data_message_extraction').item.json.sender }}",
+        "messageData": "={{ JSON.stringify(\n   {\n  'message':  $json.final_message,\n  'sessionId': $('data_message_extraction').item.json.session_id,\n  'data_time': $('data_message_extraction').item.json.data_time\n\n}\n) }}",
+        "tail": true
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1888,
+        368
+      ],
+      "id": "11b6689a-894e-41a2-b7b0-545c8c7b56be",
+      "name": "buffer1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "573f9b25-71c8-4e87-b1a8-6a421e5fd0ff",
+              "name": "final_mesage",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "c0bf24c4-4ef6-459e-acb9-0a6b9ed2e13c",
+              "name": "sessionId",
+              "value": "={{ $('data_message_extraction').item.json.session_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2064,
+        544
+      ],
+      "id": "37a02b75-f3c1-4ab9-907d-7a46425ebe13",
+      "name": "final_mesage_voice1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ JSON.parse($json.message.last()).sessionId }}",
+                    "rightValue": "={{ $('data_message_extraction').item.json.session_id }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    },
+                    "id": "21c00ecd-05ae-4391-bf3a-eefa5ce3bb81"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Ignorar"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c1066d7f-4eef-44cb-b682-1610f48085af",
+                    "leftValue": "={{ JSON.parse($json.message.last()).data_time }}",
+                    "rightValue": "={{ $now.minus(10, 'seconds').toLocal() }}",
+                    "operator": {
+                      "type": "dateTime",
+                      "operation": "before"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "continuar"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Esperar"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1440,
+        368
+      ],
+      "id": "c2e9979e-71ad-44f6-834f-25ea102ba2ef",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "amount": 7
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1424,
+        528
+      ],
+      "id": "b8d1bbbb-5e41-47fd-9627-8b5250629b1f",
+      "name": "Wait1",
+      "webhookId": "0b354f68-e423-47ea-ae9d-e8fd2cf94373"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -1264,
+        112
+      ],
+      "id": "e029890d-f979-4cd2-8083-b394b7bb36f5",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('data_message_extraction').item.json.sender }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1216,
+        368
+      ],
+      "id": "4a96a2c7-ee38-4df0-81ff-55c7bb5d4620",
+      "name": "delete_buffer"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, nombre, tipo_documento, num_doc, estado, numero_telefonico, fecha_vencimiento, sede, \nCASE \n    WHEN estado = 'activo' AND fecha_vencimiento >= CURDATE() THEN 'AUTORIZADO' \n    WHEN estado = 'activo' AND fecha_vencimiento < CURDATE() THEN 'VENCIDO' \n    WHEN estado = 'inactivo' THEN 'INACTIVO' \n    WHEN estado = 'suspendido' THEN 'SUSPENDIDO' \n    ELSE 'NO_ENCONTRADO' \nEND AS status_verificacion \nFROM usuarios \nWHERE numero_telefonico = '{{ $(\"data_message_extraction\").item.json.sender.split(\"@\")[0] }}'",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        -848,
+        368
+      ],
+      "id": "d74eb5ca-72ba-45e7-a428-7b88b6ae1b4f",
+      "name": "check_user_auth",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "96f5f8a9-bf65-4822-af83-4e7db4abee66",
+              "leftValue": "={{ $json.message_type }}",
+              "rightValue": "conversation",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2576,
+        384
+      ],
+      "id": "10b74ee5-fd6a-47da-aa9e-a4dd5e72b94e",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7e76432a-bb90-4c94-97e9-18dbc86308d1",
+              "name": "concat_message",
+              "value": "={{ $json.message.map(m=> JSON.parse(m).message).join('\\n') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1040,
+        368
+      ],
+      "id": "1a2dc48f-14aa-4e24-b9e6-84eb82ae6619",
+      "name": "concat_message"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fa5c7669-c6b7-43d4-9ad8-e5d606fbebc1",
+              "leftValue": "={{ $json.numero_telefonico }}",
+              "rightValue": "={{ $('data_message_extraction').item.json.sender.split(\"@\")[0] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -688,
+        368
+      ],
+      "id": "cb36c0c6-08ea-4f1c-bff8-6c73c0023870",
+      "name": "If_validator"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={EVOLUTION_API_BASE_URL}/message/sendText/{INSTANCE_NAME}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "apikey",
+              "value": "XXXXXXXXX"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('data_message_extraction').item.json.sender.split('@')[0] }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.unregister_user }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -640,
+        720
+      ],
+      "id": "44df8275-1504-4f1f-8862-4e5ed981d06e",
+      "name": "HTTP Request_POST_unregisUser"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "data_message_extraction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "unregistered_user_message": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request_POST_unregisUser",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "consultar_cita_valoracion": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "reprogramar_cita_valoracion": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "agendar_cita_valoracion": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "eliminar_cita_valoracion": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File1": {
+      "main": [
+        [
+          {
+            "node": "OpenAI1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data_message_extraction": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI1": {
+      "main": [
+        [
+          {
+            "node": "final_mesage_voice1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "final_message_txt": {
+      "main": [
+        [
+          {
+            "node": "buffer1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "buffer1": {
+      "main": [
+        [
+          {
+            "node": "get_buffer_data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_buffer_data1": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "final_mesage_voice1": {
+      "main": [
+        [
+          {
+            "node": "buffer1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "delete_buffer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "get_buffer_data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "delete_buffer": {
+      "main": [
+        [
+          {
+            "node": "concat_message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check_user_auth": {
+      "main": [
+        [
+          {
+            "node": "If_validator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "final_message_txt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "concat_message": {
+      "main": [
+        [
+          {
+            "node": "check_user_auth",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If_validator": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "unregistered_user_message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "190716fa-3e65-4944-a1c1-34a85f573d6e",
+  "meta": {
+    "instanceId": "0eb1a83f2e5ce668048be5d4fd523b32768cdf5c1b4787dbaa3609ddf8e8686e"
+  },
+  "id": "13s0xHmywPKFDJnG",
+  "tags": []
+}
